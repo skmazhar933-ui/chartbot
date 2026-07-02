@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI consumer Behaviour Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:        #f6f7fb;
+      --surface:   #ffffff;
+      --border:    #e5e7eb;
+      --text:      #1f2430;
+      --text-soft: #6b7280;
+      --primary:   #4f46e5;
+      --primary-soft: #eef2ff;
+      --user-bubble: #4f46e5;
+      --bot-bubble:  #f1f2f6;
+      --good:      #22c55e;
+      --bad:       #ef4444;
+      --radius:    14px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 720px;
+      height: calc(100vh - 48px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 20px rgba(20, 20, 40, 0.04);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header__icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .header__text h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .header__text p {
+      margin: 2px 0 0;
+      font-size: 12.5px;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-soft);
+      display: inline-block;
+    }
+    .dot--ok  { background: var(--good); }
+    .dot--bad { background: var(--bad); }
+
+    /* Chat area */
+    .chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .msg {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 14.5px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .msg--bot {
+      align-self: flex-start;
+      background: var(--bot-bubble);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg--user {
+      align-self: flex-end;
+      background: var(--user-bubble);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg--loading {
+      color: var(--text-soft);
+      font-style: italic;
+    }
+
+    /* Sources */
+    .sources {
+      align-self: flex-start;
+      max-width: 90%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: -4px;
+    }
+
+    .source-chip {
+      font-size: 11.5px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1px solid #e0e0fa;
+      border-radius: 999px;
+      padding: 4px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 100%;
+    }
+
+    .source-chip .pct {
+      font-weight: 600;
+    }
+
+    .source-detail {
+      align-self: flex-start;
+      max-width: 90%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: var(--text-soft);
+      display: none;
+    }
+
+    .source-detail.open { display: block; }
+
+    .source-detail strong { color: var(--text); }
+
+    /* Input area */
+    .input-bar {
+      display: flex;
+      gap: 10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .input-bar textarea {
+      flex: 1;
+      resize: none;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14.5px;
+      line-height: 1.4;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .input-bar textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    .input-bar button {
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: 10px;
+      padding: 0 20px;
+      cursor: pointer;
+      transition: background 120ms ease;
+    }
+
+    .input-bar button:hover { background: #4338ca; }
+    .input-bar button:disabled { background: #c7c9d9; cursor: progress; }
+
+    .hint {
+      text-align: center;
+      font-size: 11.5px;
+      color: var(--text-soft);
+      padding: 0 16px 12px;
+    }
+
+    /* Scrollbar */
+    .chat::-webkit-scrollbar { width: 6px; }
+    .chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 480px) {
+      body { padding: 0; }
+      .app { height: 100vh; border-radius: 0; border: none; }
+      .msg, .sources, .source-detail { max-width: 90%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <div class="header">
+      <div class="header__icon">AI</div>
+      <div class="header__text">
+        <h1>AI consumer Behaviour Assistant</h1>
+        <p><span class="dot" id="status-dot"></span><span id="status-text">connecting…</span></p>
+      </div>
+    </div>
+
+    <div class="chat" id="chat">
+      <div class="msg msg--bot">
+        Hi! Ask me anything about the documents in the knowledge base and I'll find relevant passages before answering.
+      </div>
+    </div>
+
+    <p class="hint">Press Enter to send · Shift+Enter for a new line</p>
+
+    <form class="input-bar" id="form">
+      <textarea id="input" rows="1" placeholder="Ask a question…" required></textarea>
+      <button type="submit" id="send">Send</button>
+    </form>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const form = document.getElementById("form");
+    const input = document.getElementById("input");
+    const sendBtn = document.getElementById("send");
+    const statusDot = document.getElementById("status-dot");
+    const statusText = document.getElementById("status-text");
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function addMessage(text, role) {
+      const div = document.createElement("div");
+      div.className = `msg msg--${role}`;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      return div;
+    }
+
+    function addSources(sources) {
+      if (!sources || sources.length === 0) return;
+
+      const wrap = document.createElement("div");
+      wrap.className = "sources";
+
+      sources.forEach((src) => {
+        const pct = Math.max(0, Math.min(100, Math.round(src.score * 100)));
+
+        const chip = document.createElement("div");
+        chip.className = "source-chip";
+        chip.innerHTML = `${escapeHtml(src.source)} · <span class="pct">${pct}%</span>`;
+
+        const detail = document.createElement("div");
+        detail.className = "source-detail";
+        detail.innerHTML = `<strong>${escapeHtml(src.source)}</strong><br>${escapeHtml(src.text)}`;
+
+        chip.addEventListener("click", () => detail.classList.toggle("open"));
+
+        wrap.appendChild(chip);
+        wrap.appendChild(detail);
+      });
+
+      chat.appendChild(wrap);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage(message, "user");
+      input.value = "";
+      input.style.height = "auto";
+      sendBtn.disabled = true;
+
+      const loading = addMessage("Thinking…", "bot");
+      loading.classList.add("msg--loading");
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message, top_k: 4 }),
+        });
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+        const data = await res.json();
+        loading.remove();
+        addMessage(data.answer, "bot");
+        addSources(data.sources);
+      } catch (err) {
+        loading.remove();
+        addMessage(`Error: ${err.message}`, "bot");
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+
+    // Auto-grow the textarea a little as the user types
+    input.addEventListener("input", () => {
+      input.style.height = "auto";
+      input.style.height = Math.min(input.scrollHeight, 120) + "px";
+    });
+
+    async function checkHealth() {
+      try {
+        const res = await fetch("/health");
+        const data = await res.json();
+        if (data.ollama_reachable) {
+          statusDot.className = "dot dot--ok";
+          statusText.textContent = `${data.model} · ${data.chunks_indexed} passages indexed`;
+        } else {
+          statusDot.className = "dot dot--bad";
+          statusText.textContent = "Ollama not reachable";
+        }
+      } catch {
+        statusDot.className = "dot dot--bad";
+        statusText.textContent = "Server unreachable";
+      }
+    }
+
+    checkHealth();
+  </script>
+</body>
+</html>
