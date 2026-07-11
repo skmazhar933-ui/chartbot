@@ -1,0 +1,36 @@
+# Virtual Environment files at root
+Scripts/
+share/
+pyvenv.cfg
+include/
+Lib/
+lib/
+env/
+venv/
+.venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Local cache & data
+embeddings_cache.pkl
+documents/*.csv
+documents/*.txt
+documents/*.md
+# Exclude sample data if any, but let's keep Customer Behavior.csv if it's a sample.
+!documents/Customer Behavior.csv
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
